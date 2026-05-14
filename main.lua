@@ -1,96 +1,56 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "Skylixfm",
-   LoadingTitle = "Chargement des cheats...",
+   Name = "Skylixfm | Hub Fix",
+   LoadingTitle = "Correction du script...",
    ConfigurationSaving = { Enabled = false }
 })
 
--- VARIABLES
-local autoClick = false
-local autoCollect = false
-local clickDelay = 0.1
+local Tab = Window:CreateTab("Auto-Farm", 4483362458)
 
--- ONGLET PRINCIPAL (FARM)
-local TabMain = Window:CreateTab("Auto-Farm", 4483362458)
+local clicking = false
+local delay = 0.1
 
-TabMain:CreateToggle({
+Tab:CreateToggle({
    Name = "Auto Click (Tap)",
    CurrentValue = false,
    Callback = function(Value)
-      autoClick = Value
-      if autoClick then
+      clicking = Value
+      if clicking then
          task.spawn(function()
-            while autoClick do
+            while clicking do
+               -- Méthode 1 : Simulation de clic gauche
                local vim = game:GetService("VirtualInputManager")
                vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
                vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
-               task.wait(clickDelay)
+               
+               -- Méthode 2 (Secours) : Si le jeu utilise des outils
+               local tool = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")
+               if tool then tool:Activate() end
+               
+               task.wait(delay)
             end
          end)
       end
    end,
 })
 
-TabMain:CreateSlider({
-   Name = "Vitesse Click",
+Tab:CreateSlider({
+   Name = "Vitesse Click (Secondes)",
    Min = 0.05,
    Max = 1,
    CurrentValue = 0.1,
+   Suffix = " sec",
    Callback = function(Value)
-      clickDelay = Value
+      delay = Value
    end,
 })
 
--- ONGLET JOUEUR
-local TabPlayer = Window:CreateTab("Mouvement", 4483362458)
-
-TabPlayer:CreateSlider({
-   Name = "Vitesse Course",
-   Min = 16,
-   Max = 300,
-   CurrentValue = 16,
-   Callback = function(Value)
-      game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
-   end,
-})
-
-local infJump = false
-game:GetService("UserInputService").JumpRequest:Connect(function()
-    if infJump then
-        game.Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid'):ChangeState("Jumping")
-    end
-end)
-
-TabPlayer:CreateToggle({
-   Name = "Saut Infini",
-   CurrentValue = false,
-   Callback = function(Value)
-      infJump = Value
-   end,
-})
-
--- ONGLET OPTIONS
-local TabMisc = Window:CreateTab("Autres", 4483362458)
-
-TabMisc:CreateButton({
-   Name = "Anti-AFK (Évite le Kick)",
+-- Ajout d'un bouton de test pour voir si le script réagit
+Tab:CreateButton({
+   Name = "Vérifier si le script fonctionne",
    Callback = function()
-      local vu = game:GetService("VirtualUser")
-      game.Players.LocalPlayer.Idled:Connect(function()
-         vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
-         wait(1)
-         vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
-      end)
-      Rayfield:Notify({Title = "Système", Content = "Anti-AFK Activé !"})
-   end,
-})
-
-TabMisc:CreateButton({
-   Name = "Full Bright (Lumière max)",
-   Callback = function()
-      game:GetService("Lighting").Brightness = 2
-      game:GetService("Lighting").ClockTime = 14
-      game:GetService("Lighting").GlobalShadows = false
+      Rayfield:Notify({Title = "Test", Content = "Le script est actif !"})
+      print("Le script répond bien.")
    end,
 })
